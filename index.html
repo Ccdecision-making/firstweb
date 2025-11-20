@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一个来自小弟的请求...</title>
+    
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #fdf2e9; /* 温暖的奶油色背景 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 中间的卡片 */
+        .container {
+            text-align: center;
+            background-color: #ffffff; /* 白色卡片 */
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            position: relative; /* 保证卡片在最上层 */
+            z-index: 10;
+        }
+        
+        /* 卡通小猫图片 */
+        .cat-pic {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%; /* 圆形 */
+            margin-bottom: 20px;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 标题 */
+        h1 {
+            color: #333;
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+
+        /* 副标题 */
+        p {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        /* 按钮容器 */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* 按钮之间的间距 */
+        }
+
+        /* 按钮通用样式 */
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #btn-yes { background-color: #28a745; /* 绿色 */ }
+        #btn-no { background-color: #dc3545; /* 红色 */ }
+
+        /* --- 弹窗样式 --- */
+        
+        /* 1. 弹窗背景遮罩 (半透明黑色) */
+        #overlay {
+            position: fixed; /* 固定在整个屏幕 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* 半透明黑色 */
+            z-index: 99; /* 确保它在卡片之上，但在弹窗之下 */
+        }
+
+        /* 2. 弹窗本身 (卡片) */
+        .modal {
+            position: fixed; /* 固定在屏幕中央 */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* 居中显示 */
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 100; /* 确保在最顶层 */
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+        }
+        
+        /* 弹窗里的 Emoji */
+        .modal-emoji {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        
+        /* 弹窗里的文字 */
+        .modal p {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 25px; /* 为关闭按钮留出空间 */
+        }
+        
+        /* 弹窗的关闭按钮 */
+        .close-btn {
+            background-color: #007bff; /* 蓝色 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        /* 3. 用于隐藏的类 (JavaScript 会用到) */
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <img src="cat.png" alt="可爱卡通小猫" class="cat-pic">
+        
+        <h1>大哥！</h1>
+        <p>我想吃个小蛋糕...可以嘛？</p>
+
+        <div class="buttons">
+            <button id="btn-yes" onclick="showYesModal()">
+                可 以
+            </button>
+            <button id="btn-no" onclick="showNoModal()">
+                不可以
+            </button>
+        </div>
+    </div>
+
+    <div id="overlay" class="hidden" onclick="closeModal()"></div>
+
+    <div id="yes-modal" class="modal hidden">
+        <div class="modal-emoji">🥰</div>
+        <p>谢谢大哥，大哥最好了！</p>
+        <div class="close-btn" onclick="closeModal()">好耶！</div>
+    </div>
+    
+    <div id="no-modal" class="modal hidden">
+        <div class="modal-emoji">🥺</div>
+        <p>求求你了大哥，大哥就应该罩着小弟！</p>
+        <div class="close-btn" onclick="closeModal()">再求一次</div>
+    </div>
+
+
+    <script>
+        // 获取我们要操作的元素
+        const overlay = document.getElementById('overlay');
+        const yesModal = document.getElementById('yes-modal');
+        const noModal = document.getElementById('no-modal');
+
+        // 当点击“可以”时
+        function showYesModal() {
+            overlay.classList.remove('hidden');  // 显示遮罩
+            yesModal.classList.remove('hidden'); // 显示“可以”弹窗
+        }
+
+        // 当点击“不可以”时
+        function showNoModal() {
+            overlay.classList.remove('hidden'); // 显示遮罩
+            noModal.classList.remove('hidden'); // 显示“不可以”弹窗
+        }
+
+        // 当点击“关闭按钮”或“背景遮罩”时
+        function closeModal() {
+            overlay.classList.add('hidden');  // 隐藏遮罩
+            yesModal.classList.add('hidden'); // 隐藏“可以”弹窗
+            noModal.classList.add('hidden');  // 隐藏“不可以”弹窗
+        }
+    </script>
+
+</body>
+</html>
